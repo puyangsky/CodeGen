@@ -5,9 +5,8 @@ import (
 	//"strings"
 )
 
-//判断文件是否存在
+//判断文件和路径是否存在
 func PathExists(filename string) (bool, error){
-	//strings.Contains(filename, "/")
 	_, err := os.Stat(filename)
 	if err == nil {
 		return true, nil
