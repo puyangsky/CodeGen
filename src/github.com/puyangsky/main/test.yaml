@@ -1,4 +1,21 @@
-cname: Test
+name: Test
 type:  Controller
 ctype: class
 mode:  public
+methods:
+  - mname: show
+    mmode:  private static
+    mparameters:
+      - pname: age
+        ptype: int
+      - pname: name
+        ptype: String
+    mreturn:
+      pname: user
+      ptype: String
+
+variables:
+  - vname:  name
+    vtype:  String
+    vmode:  public
+    vvalue: puyangsky

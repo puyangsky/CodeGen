@@ -18,12 +18,14 @@ func GenCode(configPath string, gentype string, output string) error {
 			return err
 		}
 
-		fmt.Printf("-----\n[DEBUG] Config content:\n%s\n", string(data))
+		fmt.Printf("-----\n[DEBUG] Config content:\n------\n%s\n", string(data))
 
 		err = yaml.Unmarshal(data, &class)
 		if err != nil {
 			return err
 		}
+
+		fmt.Printf("-----\n[DEBUG] Class content:\n------\n%v\n", class.toString())
 	}
 
 	return nil
