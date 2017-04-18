@@ -1,0 +1,4 @@
+cname: Test
+type:  Controller
+ctype: class
+mode:  public
