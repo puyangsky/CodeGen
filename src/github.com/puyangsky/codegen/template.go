@@ -1,42 +1,42 @@
 package codegen
 
-import "fmt"
+import (
+	"text/template"
+	"os"
+	"strings"
+	"errors"
+)
 
-//类
-type Class struct {
-	ClassName 	string			`yaml:"name"`
-	Type		string			`yaml:"type"`				//类型: Controller/Dao/Service/Model
-	ClassType	string			`yaml:"ctype"`				//类的类型: class/interface
-	AccessMode	string			`yaml:"mode"`				//类的访问类型: public/private/protected/static/final
-	Methods 	[]Method		`yaml:"methods"`
-	Variables	[]Variable		`yaml:"variables"`
-}
+/*
+注入数据，从模板生成代码
+ */
+func GenFromTempalte(dst string, class Class) error{
 
-//成员变量
-type Variable struct {
-	VariableName 	string		`yaml:"vname"`
-	VariableType 	string		`yaml:"vtype"`				//成员变量的类型: String/int/double等
-	AccessMode		string		`yaml:"vmode"`				//成员变量的访问类型: public/private/protected/static/final
-	VariableValue	interface{}	`yaml:"vvalue"`
-}
+	tpl := class.Type + ".tpl"
+	t, err := template.ParseFiles(tpl)
+	CheckErr(err)
 
-//参数
-type Parameter struct {
-	ParameterName	string		`yaml:"pname"`				//参数名称
-	ParameterType 	string		`yaml:"ptype"`				//参数类型：String/int/double等
-}
+	var separator string
+	if os.IsPathSeparator('\\') {  //前边的判断是否是系统的分隔符
+		separator = "\\"
+	} else {
+		separator = "/"
+	}
 
+	// 确保dst不以'/'结尾
+	path := dst + separator + strings.ToLower(class.Type)
+	println("path:", path)
+	// 判断文件夹是否存在，不存在则创建文件夹
+	if exist, _ := PathExists(path); !exist {
+		os.Mkdir(path, os.ModePerm)
+	}
+	// 判断文件是否存在，不存在则创建文件
+	filePath := path + separator + class.ClassName + ".java"
+	if exist, _ := PathExists(filePath); !exist {
+		file, err := os.Create(filePath)
+		err = t.Execute(file, class)
+		CheckErr(err)
+	}
 
-//方法
-type Method struct {
-	MethodName 	string			`yaml:"mname"`
-	AccessMode	string			`yaml:"mmode"`			//方法的访问类型: public/private/protected/static/final/abstract
-	Parameters 	[]Parameter		`yaml:"mparameters"`		//方法的参数数组
-	Return		Parameter		`yaml:"mreturn"`		//方法的返回值
-}
-
-func (c *Class) toString() string {
-	classStr := fmt.Sprintf("ClassName: %s\nType: %s\nClassType: %s\nAccessMode: %s\nMethods len: %d\n" +
-		"Variables len: %d", c.ClassName, c.Type, c.ClassType, c.AccessMode, len(c.Methods), len(c.Variables))
-	return classStr
+	return errors.New("File already exists!")
 }
